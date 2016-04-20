@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+import sys
+import time
+import signal
+import tornado.web
+import tornado.ioloop
+import tornado.httpserver
+
+from ying.cfg import cfg
+from ying.api import url_maps
+from ying.common import utils
+
+MAX_WAIT = 3
+
+def stop_handler(sig, frame):
+    tornado.ioloop.IOLoop.instance().add_callback(shutdown)
+
+def shutdown():
+    http_server.stop()
+    timeout = time.time() + MAX_WAIT
+    io_loop = tornado.ioloop.IOLoop.instance()
+    def stop_loop():
+        now = time.time()
+        if now < timeout and (io_loop._callbacks or io_loop._timeouts):
+            io_loop.add_timeout(now+1, stop_loop)
+        else:
+            io_loop.stop()
+    stop_loop()
+
+def main():
+    global app
+    global http_server
+    app = tornado.web.Application(url_maps)
+    http_server = tornado.httpserver.HTTPServer(app, xheaders=True)
+    http_server.bind(cfg.port, cfg.address)
+    signal.signal(signal.SIGTERM, stop_handler)
+    signal.signal(signal.SIGINT, stop_handler)
+    http_server.start(0)
+    tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+    main()
