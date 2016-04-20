@@ -18,4 +18,7 @@ setup(
     ],
 
     packages=find_packages(),
+    data_files=[
+        ('/etc/ying/', ['etc/ying.conf']),
+    ],
 )
