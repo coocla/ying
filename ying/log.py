@@ -4,7 +4,7 @@ import sys
 import logging
 import logging.handlers
 
-from odc_api.cfg import cfg
+from ying.cfg import cfg
 
 def create_logger(name, filename):
     root = logging.getLogger(name)
