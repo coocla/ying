@@ -18,7 +18,7 @@ class FileAuth(BaseAuthentication):
         授权方法, 应该返回 [{"type": repo, "name": image_name, "actions":["pull", "push"]}]
         '''
         repo, ns_img, do_what = scope.split(":")
-        namespace = ns_img.split("/")
+        namespace = ns_img.split("/")[0]
         if namespace == account:
             # owner
             actions = ["pull", "push"]
